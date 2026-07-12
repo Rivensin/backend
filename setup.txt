@@ -1,0 +1,35 @@
+npm init -y
+
+npm i express
+
+npm i nodemon --save-dev
+
+npx prisma init
+
+npm i prisma --save-dev
+
+npm i @prisma/client
+
+npm install @prisma/adapter-pg pg
+
+npm i dotenv
+
+npm i bcryptjs
+
+npm i jsonwebtoken
+
+npm i zod
+
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+
+
+
+//CHEAT SHEET
+
+npx prisma migrate dev --name add_user_table
+
+npx prisma generate
+
+
+
+
