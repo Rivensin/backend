@@ -1,4 +1,5 @@
 //EXPRESS SETUP
+import cors from 'cors'
 import express from 'express'
 import { config } from 'dotenv'
 import { connectDB } from './config/db.js'
@@ -12,6 +13,19 @@ config()
 connectDB()
 
 const app = express()
+
+//handle CORS
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://watchlist-frontend.vercel.app",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 //Body Parsing Middleware
 app.use(express.json())
