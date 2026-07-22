@@ -1,25 +1,6 @@
-import express from 'express'
-import { config } from 'dotenv'
-import { connectDB, disconnectDB } from './config/db.js'
-
-//Import Routes
-import movieRoutes from './routes/movieRoutes.js'
-import authRoutes from './routes/authRoutes.js'
-import watchlistRoutes from './routes/watchlistRoutes.js'
-
-config()
-connectDB()
-
-const app = express()
-
-//Body Parsing Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
-//API Routes
-app.use('/movies', movieRoutes)
-app.use('/auth', authRoutes)
-app.use('/watchlist', watchlistRoutes)
+//FOR LOCAL DEVELOPMENT
+import app from './app.js'
+import { disconnectDB } from './config/db.js'
 
 const PORT = 5001
 
@@ -46,7 +27,7 @@ process.on('uncaughtException', (err) => {
 process.on('SIGTERM', (err) => {
   console.log('SIGTERM received, shutting down gracefully')
   server.close(async() => {
-    disconnectDB()
+    await disconnectDB()
     process.exit(1)
   })
 })
