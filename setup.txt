@@ -20,6 +20,8 @@ npm i jsonwebtoken
 
 npm i zod
 
+npm install cors
+
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 
