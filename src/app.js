@@ -1,5 +1,6 @@
 //EXPRESS SETUP
 import cors from 'cors'
+import cookieParser from "cookie-parser";
 import express from 'express'
 import { config } from 'dotenv'
 import { connectDB } from './config/db.js'
@@ -14,6 +15,13 @@ connectDB()
 
 const app = express()
 
+//Body Parsing Middleware
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+//handle cookies
+app.use(cookieParser())
+
 //handle CORS
 app.use(
   cors({
@@ -26,10 +34,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-//Body Parsing Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
 //API Routes
 app.use('/movies', movieRoutes)

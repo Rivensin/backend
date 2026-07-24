@@ -1,7 +1,16 @@
 import { prisma } from "../config/db.js"
 
 const getMovie = async(req,res) => {
-  const movie = await prisma.movie.findMany()
+  const movie = await prisma.movie.findMany({
+    include : {
+      creator: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
+    }
+  })
 
   if (movie.length === 0) {
     return res.status(404).json({
