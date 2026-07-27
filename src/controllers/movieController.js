@@ -24,8 +24,10 @@ const getMovie = async(req,res) => {
 const addMovie = async(req,res) => {
   const {title, overview, releaseYear, genres, posterUrl} = req.body
 
-  const movieExists = await prisma.movie.findUnique({
-    where: title
+  const movieExists = await prisma.movie.findFirst({
+    where: {
+      title,
+    }
   })
 
   if(movieExists){
@@ -40,7 +42,8 @@ const addMovie = async(req,res) => {
       overview,
       releaseYear,
       genres,
-      posterUrl
+      posterUrl,
+      createdBy: req.user.id,
     }
   })
 

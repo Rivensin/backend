@@ -24,7 +24,9 @@ npm install cors
 
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
+---FRONTEND
 
+npm install @tanstack/react-query
 
 //CHEAT SHEET
 

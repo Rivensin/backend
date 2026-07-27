@@ -7,6 +7,6 @@ import { addMovieSchema } from '../validators/movieValidators.js'
 const router = express.Router()
 
 router.get('/',getMovie)
-router.post('/addMovie', validateRequest(addMovieSchema), authMiddleware, addMovie)
+router.post('/addMovie', authMiddleware, validateRequest(addMovieSchema) , addMovie)
 
 export default router
