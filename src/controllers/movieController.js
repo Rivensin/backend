@@ -21,6 +21,39 @@ const getMovie = async(req,res) => {
   res.status(200).json(movie)
 }
 
+export const getMovieUser = async(req,res) => {
+
+  const movie = await prisma.movie.findMany({
+    where : {
+      createdBy: req.user.id      
+    }
+  })
+
+  if (movie.length === 0) {
+    return res.status(404).json({
+      error: "No movies found",
+    });
+  }
+
+  res.status(200).json(movie)
+}
+
+export const getMovieById = async(req,res) => {
+  const moviebyId = await prisma.movie.findUnique({
+    where : {
+      id: req.params.id      
+    }
+  })
+
+  if (!moviebyId) {
+    return res.status(404).json({
+      error: "No movies found",
+    });
+  }
+
+  res.status(200).json(movie)
+}
+
 const addMovie = async(req,res) => {
   const {title, overview, releaseYear, genres, posterUrl} = req.body
 
@@ -80,36 +113,36 @@ const addMovie = async(req,res) => {
 //   })
 // }
 
-// const updateFromWatchList = async(req,res) => {
-//   const {status, rating, notes} = req.body
+export const updateMovie = async(req,res) => {
+  const {title, overview, releaseYear, genres, posterUrl} = req.body
 
-//   const watchlistItems = await prisma.watchlistItem.findUnique({
-//     where: {id: req.params.id}
-//   })
+  const watchlistItems = await prisma.watchlistItem.findUnique({
+    where: {id: req.params.id}
+  })
 
-//   if(watchlistItems.userId !== req.user.id){
-//     return res.status(403).json({
-//       error: 'Not allowed to update this watchlist item'
-//     })
-//   }
+  if(watchlistItems.userId !== req.user.id){
+    return res.status(403).json({
+      error: 'Not allowed to update this watchlist item'
+    })
+  }
 
-//   const updateData = {}
-//   if(status !== undefined) updateData.status = status.toUpperCase()
-//   if(rating !== undefined) updateData.rating = rating
-//   if(notes !== undefined) updateData.notes = notes
+  const updateData = {}
+  if(status !== undefined) updateData.status = status.toUpperCase()
+  if(rating !== undefined) updateData.rating = rating
+  if(notes !== undefined) updateData.notes = notes
 
-//   const updatedItem = await prisma.watchlistItem.update({
-//     where: {id: req.params.id},
-//     data: updateData    
-//   })
+  const updatedItem = await prisma.watchlistItem.update({
+    where: {id: req.params.id},
+    data: updateData    
+  })
 
-//   res.status(200).json({
-//     status: 'success',
-//     data : {
-//       watchlistItems : updatedItem
-//     }
-//   })
-// }
+  res.status(200).json({
+    status: 'success',
+    data : {
+      watchlistItems : updatedItem
+    }
+  })
+}
 
 
 export {getMovie, addMovie}
