@@ -39,9 +39,10 @@ export const getMovieUser = async(req,res) => {
 }
 
 export const getMovieById = async(req,res) => {
+  const { id } = req.params
   const moviebyId = await prisma.movie.findUnique({
     where : {
-      id: req.params.id      
+      id      
     }
   })
 
@@ -51,7 +52,7 @@ export const getMovieById = async(req,res) => {
     });
   }
 
-  res.status(200).json(movie)
+  res.status(200).json(moviebyId)
 }
 
 const addMovie = async(req,res) => {
