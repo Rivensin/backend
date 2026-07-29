@@ -87,63 +87,107 @@ const addMovie = async(req,res) => {
   })
 }
 
-// const removeFromWatchList = async(req,res) => {
-//   const watchListItem = await prisma.WatchlistItem.findUnique({
-//     where : {id : req.params.id}
-//   })
-
-//   if(!watchListItem){
-//     return res.status(401).json({
-//       error: 'Watchlist item not found'
-//     })
-//   }
-
-//   if(watchListItem.userId !== req.user.id){
-//     return res.status(403).json({
-//       error: 'Not allowed to update this watchlist item'
-//     })
-//   }
-
-//   await prisma.WatchlistItem.delete({
-//     where : { id: req.params.id}
-//   })
-
-//   res.status(200).json({
-//     status: "success",
-//     message: 'Movie removed from watchlist'
-//   })
-// }
-
-export const updateMovie = async(req,res) => {
-  const {title, overview, releaseYear, genres, posterUrl} = req.body
-
-  const watchlistItems = await prisma.watchlistItem.findUnique({
-    where: {id: req.params.id}
-  })
-
-  if(watchlistItems.userId !== req.user.id){
-    return res.status(403).json({
-      error: 'Not allowed to update this watchlist item'
+const removeMovie = async(req,res) => {
+  try {
+    const movie = await prisma.movie.findUnique({
+      where : {id : req.params.id}
     })
-  }
 
-  const updateData = {}
-  if(status !== undefined) updateData.status = status.toUpperCase()
-  if(rating !== undefined) updateData.rating = rating
-  if(notes !== undefined) updateData.notes = notes
-
-  const updatedItem = await prisma.watchlistItem.update({
-    where: {id: req.params.id},
-    data: updateData    
-  })
-
-  res.status(200).json({
-    status: 'success',
-    data : {
-      watchlistItems : updatedItem
+    if(!movie){
+      return res.status(404).json({
+        error: 'Movie not found'
+      })
     }
-  })
+
+    if(movie.createdBy !== req.user.id){
+      return res.status(403).json({
+        error: 'Not allowed to delete this movie'
+      })
+    }
+
+    await prisma.movie.delete({
+      where : { id: req.params.id}
+    })
+
+    return res.status(200).json({
+      status: "success",
+      message: 'Movie removed successfully'
+    })
+  }catch(error){
+    console.error(error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  } 
 }
 
+const updateMovie = async(req,res) => {
+  const { id } = req.params
 
-export {getMovie, addMovie}
+  const userId = req.user.id
+
+  const {title, overview, releaseYear, genres, posterUrl} = req.body
+
+  try{
+    const existingMovie = await prisma.movie.findUnique({
+      where: { id } 
+    })
+
+    if (!existingMovie) {
+      return res.status(404).json({
+        error: 'Movie not found'
+      })
+    }
+
+    if (existingMovie.createdBy !== userId) {
+      return res.status(403).json({
+        error: 'Not allowed to update this movie'
+      })
+    }
+
+    if(title !== existingMovie.title || releaseYear !== existingMovie.releaseYear){    
+      const duplicate = await prisma.movie.findFirst({
+        where: {
+          title,
+          releaseYear,
+          NOT: {
+            id
+          }
+        }
+      })
+
+      if (duplicate) {
+        return res.status(409).json({
+          error: 'Movie already exists'
+        })
+      }    
+    }
+
+    const updatedMovie = await prisma.movie.update({
+      where: { id },
+      data: {
+        title,
+        overview,
+        releaseYear,
+        genres,
+        posterUrl,
+      },
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        movie: updatedMovie
+      }
+    })
+  }catch(error){
+    console.error(error)
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }   
+}
+
+export {getMovie, addMovie, updateMovie, removeMovie}
