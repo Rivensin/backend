@@ -1,5 +1,26 @@
 import { prisma } from "../config/db.js"
 
+export const getWatchlistUser = async(req,res) => {
+  try {
+    const watchlist = await prisma.watchlistItem.findMany({
+      where : {
+        userId: req.user.id      
+      },
+      include : {
+        movie: true
+      }
+    })
+
+    res.status(200).json(watchlist)
+  }catch(error){
+    console.error(error)
+
+    return res.status(500).json({
+      error: "Internal server error",
+    })
+  }
+}
+
 const addToWatchList = async(req,res) => {
   const {movieId, status, rating, notes} = req.body
 

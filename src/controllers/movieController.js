@@ -1,39 +1,41 @@
 import { prisma } from "../config/db.js"
 
 const getMovie = async(req,res) => {
-  const movie = await prisma.movie.findMany({
-    include : {
-      creator: {
-        select: {
-          id: true,
-          name: true
+  try {
+    const movie = await prisma.movie.findMany({
+      include : {
+        creator: {
+          select: {
+            id: true,
+            name: true
+          }
         }
       }
+    })
+
+    if (movie.length === 0) {
+      return res.status(404).json({
+        error: "No movies found",
+      });
     }
-  })
 
-  if (movie.length === 0) {
-    return res.status(404).json({
-      error: "No movies found",
-    });
+    res.status(200).json(movie)
+  }catch(error){
+    console.error(error)
+
+    return res.status(500).json({
+      error: "Internal server error",
+    })
   }
-
-  res.status(200).json(movie)
 }
 
 export const getMovieUser = async(req,res) => {
-
+  
   const movie = await prisma.movie.findMany({
     where : {
       createdBy: req.user.id      
     }
   })
-
-  if (movie.length === 0) {
-    return res.status(404).json({
-      error: "No movies found",
-    });
-  }
 
   res.status(200).json(movie)
 }
