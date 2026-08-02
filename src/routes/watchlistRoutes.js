@@ -1,19 +1,21 @@
 import express from 'express'
-import { addToWatchList, removeFromWatchList, updateFromWatchList, getWatchlistUser } from '../controllers/watchlistController.js'
+import { addToWatchList, removeFromWatchList, updateFromWatchList, getWatchlist, getWatchlistDetails } from '../controllers/watchlistController.js'
 import { authMiddleware } from '../middleware/authMiddleware.js'
 import { validateRequest } from '../middleware/validateRequest.js'
-import { addToWatchlistSchema, UpdateWatchlistSchema } from '../validators/watchlistValidator.js'
+import { WatchlistSchema } from '../validators/watchlistValidator.js'
 
 const router = express.Router()
 
 router.use(authMiddleware)
 
-router.get('/getWatchlist', getWatchlistUser)
+router.get('/', getWatchlist)
 
-router.post('/:id', validateRequest(addToWatchlistSchema), addToWatchList)
+router.get('/:id', getWatchlistDetails)
 
 router.delete('/:id',removeFromWatchList)
 
-router.put('/:id',validateRequest(UpdateWatchlistSchema), updateFromWatchList)
+router.post('/:id', validateRequest(WatchlistSchema), addToWatchList)
+
+router.put('/:id',validateRequest(WatchlistSchema), updateFromWatchList)
 
 export default router

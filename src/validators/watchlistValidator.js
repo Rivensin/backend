@@ -1,6 +1,6 @@
 import {z} from 'zod'
 
-const addToWatchlistSchema = z.object({  
+const WatchlistSchema = z.object({  
   status: z.enum([
     "PLANNED",
     "WATCHING",
@@ -10,20 +10,7 @@ const addToWatchlistSchema = z.object({
     message: "Status must be one of: PLANNED,  WATCHING, COMPLETED, DROPPED"
   })}),
   rating: z.coerce.number().int('Rating must be in integer').min(1,'Rating must be between 1 and 10').max(10,'Rating must be between 1 and 10'),
-  notes: z.string().optional()
+  notes: z.string().max(500,'Notes must be less than 500 characters').optional()
 })
 
-const UpdateWatchlistSchema = z.object({
-  status: z.enum([
-    "PLANNED",
-    "WATCHING",
-    "COMPLETED",
-    "DROPPED"
-  ],{error : () => ({
-    message: "Status must be one of: PLANNED,  WATCHING, COMPLETED, DROPPED"
-  })}).optional(),
-  rating: z.coerce.number().int('Rating must be in integer').min(1,'Rating must be between 1 and 10').max(10,'Rating must be between 1 and 10').optional(),
-  notes: z.string().optional()
-})
-
-export { addToWatchlistSchema, UpdateWatchlistSchema }
+export { WatchlistSchema }
