@@ -27,7 +27,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://watchlist-frontend.vercel.app",
+      "https://watchlistmovieapp.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
