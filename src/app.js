@@ -15,14 +15,15 @@ connectDB()
 
 const app = express()
 
-//Body Parsing Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-
-//handle cookies
-app.use(cookieParser())
-
 //handle CORS
+app.use((req, res, next) => {
+  console.log({
+    requestOrigin: req.headers.origin,
+    allowedOrigin,
+  });
+  next();
+});
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
@@ -31,6 +32,18 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+console.log({
+  CLIENT_URL: process.env.CLIENT_URL,
+  type: typeof process.env.CLIENT_URL,
+});
+
+//Body Parsing Middleware
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+//handle cookies
+app.use(cookieParser())
 
 //API Routes
 app.use('/movies', movieRoutes)
