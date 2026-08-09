@@ -8,4 +8,8 @@ const addMovieSchema = z.object({
   posterUrl: z.string().url('Invalid poster URL'),  
 })
 
-export { addMovieSchema }
+const getMovieSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+});
+
+export { addMovieSchema, getMovieSchema }

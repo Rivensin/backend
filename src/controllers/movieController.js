@@ -1,8 +1,18 @@
 import { prisma } from "../config/db.js"
 
+const limit = 10
+
 const getMovie = async(req,res) => {
-  try {
+  const skip = (req.query.page - 1) * limit
+
+  try {   
+    const total = await prisma.movie.count();
+
+    const totalPages = Math.ceil(total / limit);
+
     const movie = await prisma.movie.findMany({
+      skip,
+      take: limit,
       include : {
         creator: {
           select: {
@@ -19,7 +29,46 @@ const getMovie = async(req,res) => {
       });
     }
 
-    res.status(200).json(movie)
+    res.status(200).json({
+      totalPages,
+      currentPage: req.query.page,
+      data: movie
+    })
+
+  }catch(error){
+    console.error(error)
+
+    return res.status(500).json({
+      error: "Internal server error",
+    })
+  }
+} 
+
+export const getMovieUser = async(req,res) => {
+  const skip = (req.query.page - 1) * limit
+ 
+  try {
+    const total = await prisma.movie.count({
+      where : {
+        createdBy : req.user.id
+      }
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    const movie = await prisma.movie.findMany({
+      skip,
+      take: limit,
+      where : {
+        createdBy: req.user.id      
+      }
+    })
+    
+    res.status(200).json({
+      totalPages,
+      currentPage: req.query.page,
+      data: movie
+    })
   }catch(error){
     console.error(error)
 
@@ -29,19 +78,9 @@ const getMovie = async(req,res) => {
   }
 }
 
-export const getMovieUser = async(req,res) => {
-  
-  const movie = await prisma.movie.findMany({
-    where : {
-      createdBy: req.user.id      
-    }
-  })
-
-  res.status(200).json(movie)
-}
-
 export const getMovieById = async(req,res) => {
   const { id } = req.params
+
   const moviebyId = await prisma.movie.findUnique({
     where : {
       id      
