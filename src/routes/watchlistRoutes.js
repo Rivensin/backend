@@ -3,16 +3,17 @@ import { addToWatchList, removeFromWatchList, updateFromWatchList, getWatchlist,
 import { authMiddleware } from '../middleware/authMiddleware.js'
 import { validateRequest } from '../middleware/validateRequest.js'
 import { WatchlistSchema } from '../validators/watchlistValidator.js'
+import { getMovieSchema } from '../validators/movieValidators.js'
 
 const router = express.Router()
 
 router.use(authMiddleware)
 
-router.get('/', getWatchlist)
+router.get('/', authMiddleware, validateRequest(getMovieSchema,'query'), getWatchlist)
 
-router.get('/:id', getWatchlistDetails)
+router.get('/:id', authMiddleware, getWatchlistDetails)
 
-router.delete('/:id',removeFromWatchList)
+router.delete('/:id', authMiddleware, removeFromWatchList)
 
 router.post('/:id', validateRequest(WatchlistSchema), addToWatchList)
 

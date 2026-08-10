@@ -3,16 +3,41 @@ import { prisma } from "../config/db.js"
 const limit = 10
 
 const getMovie = async(req,res) => {
-  const skip = (req.query.page - 1) * limit
+  //mengambil params page
+  const page = Number(req.query.page) || 1
 
-  try {   
-    const total = await prisma.movie.count();
+  //menentukan skip
+  const skip = (page - 1) * limit
 
+  //mengambil params search
+  const search = req.query.search?.trim() || ''
+
+  //definisi where title movie contains params search 
+    const where = search
+      ? 
+        {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        }
+      : 
+      undefined;
+
+  try {    
+    //mengambil total movie dari params search
+    const total = await prisma.movie.count({
+      where
+    });
+
+    //mengambil total pages dari total movie
     const totalPages = Math.ceil(total / limit);
 
+    //menarik data movie
     const movie = await prisma.movie.findMany({
+      where,
       skip,
-      take: limit,
+      take: limit,   
       include : {
         creator: {
           select: {
@@ -20,7 +45,7 @@ const getMovie = async(req,res) => {
             name: true
           }
         }
-      }
+      }         
     })
 
     if (movie.length === 0) {
@@ -31,7 +56,7 @@ const getMovie = async(req,res) => {
 
     res.status(200).json({
       totalPages,
-      currentPage: req.query.page,
+      currentPage: page,
       data: movie
     })
 
@@ -45,13 +70,25 @@ const getMovie = async(req,res) => {
 } 
 
 export const getMovieUser = async(req,res) => {
-  const skip = (req.query.page - 1) * limit
- 
+  const page = Number(req.query.page) || 1
+
+  const search = req.query.search || ''
+
+  const skip = (page - 1) * limit
+
+  const where = {
+    createdBy: req.user.id,
+    ...(search && {
+      title : {
+        contains: search,
+        mode: 'insensitive'
+      }
+    })
+  }
+    
   try {
     const total = await prisma.movie.count({
-      where : {
-        createdBy : req.user.id
-      }
+      where,
     });
 
     const totalPages = Math.ceil(total / limit);
@@ -59,14 +96,12 @@ export const getMovieUser = async(req,res) => {
     const movie = await prisma.movie.findMany({
       skip,
       take: limit,
-      where : {
-        createdBy: req.user.id      
-      }
+      where,
     })
     
     res.status(200).json({
       totalPages,
-      currentPage: req.query.page,
+      currentPage: page,
       data: movie
     })
   }catch(error){

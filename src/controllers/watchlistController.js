@@ -1,5 +1,7 @@
 import { prisma } from "../config/db.js"
 
+const limit = 10
+
 const addToWatchList = async(req,res) => {
   const {status, rating, notes} = req.body
   const { id } = req.params
@@ -114,11 +116,35 @@ const updateFromWatchList = async(req,res) => {
   }
 }
 const getWatchlist = async (req,res) => {
+  const page = Number(req.query.page) || 1
+
+  const skip = (page - 1) * limit
+
+  const search = req.query.search.trim() || ''
+
+  const where = {
+    userId: req.user.id,
+    ...(search && {
+      movie : {
+        title: {
+          contains: search,
+          mode: 'insensitive'
+        }
+      }
+    })
+  }
+
   try {
+    const total = await prisma.watchlistItem.count({
+      where,
+    })
+
+    const totalPages = Math.ceil(total/limit)
+
     const watchlist = await prisma.WatchlistItem.findMany({
-      where: {
-        userId: req.user.id
-      },
+      skip,
+      take: limit,
+      where,
       select: {
         id: true,
         status: true,
@@ -136,7 +162,11 @@ const getWatchlist = async (req,res) => {
       }
     })
 
-    res.status(200).json(watchlist)
+    res.status(200).json({
+      currentPage : page,
+      totalPages,
+      data : watchlist
+    })
 
   }catch(error){
     console.error(error)
