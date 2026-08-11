@@ -37,7 +37,10 @@ const getMovie = async(req,res) => {
     const movie = await prisma.movie.findMany({
       where,
       skip,
-      take: limit,   
+      take: limit,
+      orderBy: {
+        title: 'asc'
+      },   
       include : {
         creator: {
           select: {
@@ -96,6 +99,9 @@ export const getMovieUser = async(req,res) => {
     const movie = await prisma.movie.findMany({
       skip,
       take: limit,
+      orderBy: {
+        title: 'asc'
+      },
       where,
     })
     
@@ -133,6 +139,14 @@ export const getMovieById = async(req,res) => {
 
 const addMovie = async(req,res) => {
   const {title, overview, releaseYear, genres, posterUrl} = req.body
+
+  const url = new URL(posterUrl)
+
+  if ( url.protocol !== "https:" || url.hostname !== "m.media-amazon.com") {
+    return res.status(400).json({
+      error: "Poster URL must be from m.media-amazon.com",
+    });
+  }
 
   const movieExists = await prisma.movie.findFirst({
     where: {
