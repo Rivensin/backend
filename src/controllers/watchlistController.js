@@ -13,6 +13,8 @@ const getWatchlist = async (req,res) => {
 
   const status = req.query.status || ''
 
+  const sort = req.query.sort || ''
+
   if(status && !validStatuses.includes(status)){
     return res.status(400).json({
       error: "Invalid watchlist status",
@@ -34,6 +36,29 @@ const getWatchlist = async (req,res) => {
     })
   }
 
+  const sortOptions = {
+    Title_asc: {
+      movie: {title: 'asc'}
+    },
+    Title_desc: {
+      movie: {title: 'desc'}
+    },
+    Rating_asc: {
+      rating: 'asc'
+    },
+    Rating_desc: {
+      rating: 'desc'
+    },
+    CreatedTime_asc: {
+      updatedAt: 'asc'
+    },
+    CreatedTime_desc: {
+      updatedAt: 'desc'
+    },
+  }
+
+  const orderBy = sortOptions[sort] ?? sortOptions.title_asc 
+
   try {
     const total = await prisma.watchlistItem.count({
       where,
@@ -44,11 +69,7 @@ const getWatchlist = async (req,res) => {
     const watchlist = await prisma.WatchlistItem.findMany({
       skip,
       take: limit,
-      orderBy: {
-        movie : {
-          title: 'asc'
-        }
-      },
+      orderBy,
       where,
       select: {
         id: true,
@@ -72,6 +93,29 @@ const getWatchlist = async (req,res) => {
       totalPages,
       data : watchlist
     })
+
+  }catch(error){
+    console.error(error)
+
+    return res.status(500).json({
+      error: "Internal server error",
+    })
+  } 
+}
+
+const getWatchlistStats = async (req,res) => {
+  try {
+    const watchlist = await prisma.WatchlistItem.groupBy({
+      by: ['status'],
+      where : {
+        userId: req.user.id
+      },
+      _count : {
+        _all: true,
+      }
+    })
+
+    res.status(200).json(watchlist)
 
   }catch(error){
     console.error(error)
@@ -229,4 +273,4 @@ const updateFromWatchList = async(req,res) => {
   }
 }
 
-export {addToWatchList, removeFromWatchList, updateFromWatchList, getWatchlist, getWatchlistDetails}
+export {addToWatchList, removeFromWatchList, updateFromWatchList, getWatchlist, getWatchlistDetails, getWatchlistStats}
