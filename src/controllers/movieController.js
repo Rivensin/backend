@@ -51,12 +51,6 @@ const getMovie = async(req,res) => {
       }         
     })
 
-    if (movie.length === 0) {
-      return res.status(404).json({
-        error: "No movies found",
-      });
-    }
-
     res.status(200).json({
       totalPages,
       currentPage: page,
