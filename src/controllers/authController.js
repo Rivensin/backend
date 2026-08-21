@@ -80,8 +80,7 @@ const login = async (req, res) => {
       user: {
         id: userExist.id,
         email: email
-      },
-      token
+      }
   }})
 }
 
@@ -98,15 +97,7 @@ const logout = async (req, res) => {
 }
 
 const profile = async (req,res) => {
-  const user = await prisma.user.findUnique({
-    where : {
-      id: req.user.id
-    },
-    select: {
-      id: true,
-      name: true
-    }
-  })
+  const user = req.user
 
   if(!user){
     return res.status(404).json({
@@ -114,7 +105,10 @@ const profile = async (req,res) => {
     })
   }
 
-  res.json(user)
+  return res.status(200).json({
+    id: user.id,
+    name: user.name
+  })
 }
 
 export { register, login, logout, profile }

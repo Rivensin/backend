@@ -2,16 +2,11 @@
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 import express from 'express'
-import { config } from 'dotenv'
-import { connectDB } from './config/db.js'
 
 //Import Routes
 import movieRoutes from './routes/movieRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import watchlistRoutes from './routes/watchlistRoutes.js'
-
-config()
-connectDB()
 
 const app = express()
 

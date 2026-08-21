@@ -22,6 +22,10 @@ npm i zod
 
 npm install cors
 
+npm install -D jest
+
+npm install --save-dev supertest
+
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ---FRONTEND

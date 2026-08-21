@@ -1,6 +1,11 @@
 //FOR LOCAL DEVELOPMENT
 import app from './app.js'
-import { disconnectDB } from './config/db.js'
+import { connectDB, disconnectDB } from './config/db.js'
+import { config } from 'dotenv'
+
+config()
+
+await connectDB()
 
 const PORT = 5001
 
