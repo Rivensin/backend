@@ -41,9 +41,9 @@ const register = async (req, res) => {
         id: user.id,
         name: name,
         email: email
-      },
-      token
-  }})
+      }
+    }
+  })
 }
 
 const login = async (req, res) => {
@@ -87,7 +87,7 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
-    expire: new Date(0),
+    expires: new Date(0),
   })
 
   res.status(200).json({

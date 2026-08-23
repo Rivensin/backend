@@ -13,16 +13,14 @@ const getMovie = async(req,res) => {
   const search = req.query.search?.trim() || ''
 
   //definisi where title movie contains params search 
-    const where = search
-      ? 
-        {
-          title: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        }
-      : 
-      undefined;
+  const where = {
+    ...(search && {
+      title: {
+        contains: search,
+        mode: 'insensitive'
+      }
+    })
+  }
 
   try {    
     //mengambil total movie dari params search
@@ -39,7 +37,7 @@ const getMovie = async(req,res) => {
       skip,
       take: limit,
       orderBy: {
-        title: 'asc'
+        title: 'asc'  
       },   
       include : {
         creator: {
