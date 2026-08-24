@@ -248,13 +248,7 @@ const updateMovie = async(req,res) => {
 
     const updatedMovie = await prisma.movie.update({
       where: { id },
-      data: {
-        title,
-        overview,
-        releaseYear,
-        genres,
-        posterUrl,
-      },
+      data: req.body,
     });
 
     return res.status(200).json({

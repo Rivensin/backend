@@ -12,4 +12,6 @@ const getMovieSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
 });
 
-export { addMovieSchema, getMovieSchema }
+const updateMovieSchema = addMovieSchema.partial()
+
+export { addMovieSchema, getMovieSchema, updateMovieSchema }
