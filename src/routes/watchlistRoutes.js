@@ -10,7 +10,7 @@ const router = express.Router()
 router.use(authMiddleware)
 
 router.get('/', authMiddleware, validateRequest(getMovieSchema,'query'), getWatchlist)
-
+  
 router.get('/stats', authMiddleware, getWatchlistStats)
 
 router.get('/:id', authMiddleware, getWatchlistDetails)

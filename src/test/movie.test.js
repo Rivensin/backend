@@ -504,6 +504,34 @@ describe("DELETE /movies/:id", () => {
     expect(response.status).toBe(200)    
     expect(response.body.status).toBe('success');
   })
+
+  test("should return 500 when fetch movie error", async() => {
+    prisma.user.findUnique.mockResolvedValue({
+      id: 1,
+      name: 'user001'
+    })
+
+    const token = jwt.sign(
+      { id: 1 },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    prisma.movie.findUnique.mockResolvedValue({      
+      id: "6b07aa53-7715-4801-b45c-bcdeb2176307",
+      title: "Eternal Sunshine of the Spotless Mind",
+      createdBy: 1,        
+    })
+
+    prisma.movie.delete.mockRejectedValue(new Error ('Internal server error'))
+
+    const response = await request(app)
+      .delete('/movies/6b07aa53-7715-4801-b45c-bcdeb2176307')
+      .set('Cookie', `jwt=${token}`)
+
+    expect(response.status).toBe(500)
+    expect(response.body.error).toBe('Internal server error');
+  })
 });
 
 describe("PUT /movies/:id", () => {
@@ -653,5 +681,42 @@ describe("PUT /movies/:id", () => {
 
     expect(response.status).toBe(200)    
     expect(response.body.status).toBe('success');
+  })
+
+  test("should return 500 when fetch movie error", async() => {
+    prisma.user.findUnique.mockResolvedValue({
+      id: 1,
+      name: 'user001'
+    })
+
+    const token = jwt.sign(
+      { id: 1 },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    prisma.movie.findUnique.mockResolvedValue({      
+      id: "6b07aa53-7715-4801-b45c-bcdeb2176307",
+      title: "Eternal Sunshine of the Spotless Mind",
+      createdBy: 1,        
+    })
+
+    prisma.movie.findFirst.mockResolvedValue(null)
+
+    prisma.movie.update.mockRejectedValue(new Error ('Internal server error'))
+
+    const response = await request(app)
+      .put('/movies/6b07aa53-7715-4801-b45c-bcdeb2176307')
+      .set('Cookie', `jwt=${token}`)
+      .send({
+        title: "New Title",
+        overview: "New overview",
+        releaseYear: 2025,
+        genres: ["Drama"],
+        posterUrl: "https://m.media-amazon.com/images/example.jpg"
+      })
+
+    expect(response.status).toBe(500)
+    expect(response.body.error).toBe('Internal server error');
   })
 });

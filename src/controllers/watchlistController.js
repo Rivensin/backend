@@ -57,7 +57,7 @@ const getWatchlist = async (req,res) => {
     },
   }
 
-  const orderBy = sortOptions[sort] ?? sortOptions.title_asc 
+  const orderBy = sortOptions[sort] ?? sortOptions.Title_asc 
 
   try {
     const total = await prisma.watchlistItem.count({
@@ -66,7 +66,7 @@ const getWatchlist = async (req,res) => {
 
     const totalPages = Math.ceil(total/limit)
 
-    const watchlist = await prisma.WatchlistItem.findMany({
+    const watchlist = await prisma.watchlistItem.findMany({
       skip,
       take: limit,
       orderBy,
@@ -91,7 +91,8 @@ const getWatchlist = async (req,res) => {
     res.status(200).json({
       currentPage : page,
       totalPages,
-      data : watchlist
+      data : watchlist,
+      total
     })
 
   }catch(error){
@@ -105,7 +106,7 @@ const getWatchlist = async (req,res) => {
 
 const getWatchlistStats = async (req,res) => {
   try {
-    const watchlist = await prisma.WatchlistItem.groupBy({
+    const watchlist = await prisma.watchlistItem.groupBy({
       by: ['status'],
       where : {
         userId: req.user.id
@@ -128,7 +129,7 @@ const getWatchlistStats = async (req,res) => {
 
 const getWatchlistDetails = async (req,res) => {
   try {
-    const watchlist = await prisma.WatchlistItem.findUnique({
+    const watchlist = await prisma.watchlistItem.findUnique({
       where: {
         id: req.params.id
       },
