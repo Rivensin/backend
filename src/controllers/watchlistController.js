@@ -207,7 +207,7 @@ const addToWatchList = async(req,res) => {
 
 const removeFromWatchList = async(req,res) => {
   try {
-    const watchListItem = await prisma.WatchlistItem.findUnique({
+    const watchListItem = await prisma.watchlistItem.findUnique({
       where : {id : req.params.id}
     })
 
@@ -223,7 +223,7 @@ const removeFromWatchList = async(req,res) => {
       })
     }
 
-    await prisma.WatchlistItem.delete({
+    await prisma.watchlistItem.delete({
       where : { id: req.params.id}
     })
 

@@ -330,7 +330,7 @@ describe("GET /movies/:id", () => {
 
 });
 
-describe("POST /movies/addMovie", () => {
+describe("POST /movies/:id", () => {
   test("should return 409 when register but title exist", async() => {
     prisma.user.findUnique.mockResolvedValue({
       id: 1,
